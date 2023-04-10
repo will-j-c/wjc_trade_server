@@ -1,2 +1,3 @@
 const binance = require('../api/binanceAPI');
-binance.ping()
+
+binance.getPriorDayHistoricKlines()
