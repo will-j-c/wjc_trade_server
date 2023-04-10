@@ -2,6 +2,9 @@ const utils = require('../utils/utils');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('node:path');
+const unzipper = require('unzipper');
+const { parse } = require('csv-parse');
+const Kline = require('../models/kline');
 
 const baseEndpoints = [
   'https://api.binance.com',
@@ -77,14 +80,27 @@ const api = {
     // Call the binance historic data API and retrieve the zip file
     const response = await utils.getFile(endpoint);
     // Create the path name so saves in the temp downloads folder
-    const pathName = path.join(__dirname, '..', 'download', 'temp.zip');
+    const zipPathName = path.join(__dirname, '..', 'download', 'temp.zip');
+    const csvPathName = path.join(__dirname, '..', 'download');
+    console.log(csvPathName);
     // Use the fs module to download and save the temp zip file to server memory
-    const writer = fs.createWriteStream(pathName);
+    const writer = fs.createWriteStream(zipPathName);
     response.data.pipe(writer);
     // Handle unpacking the zip file
+    fs.createReadStream(zipPathName).pipe(
+      unzipper.Extract({ path: csvPathName })
+    );
     // Handle writing the csv to the DB
+    const fileToOpen = `${csvPathName}/${
+      fs.readdirSync(csvPathName).filter((fn) => fn.endsWith('.csv'))[0]
+    }`;
+    console.log(fileToOpen);
+    fs.createReadStream(fileToOpen)
+      .pipe(parse({ delimiter: ',' }))
+      .on('data', function (row) {
+        console.log(row);
+      });
     // Handle closing the files and deleting temp files
-
   },
 };
 
