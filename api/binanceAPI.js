@@ -1,5 +1,7 @@
 const utils = require('../utils/utils');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('node:path');
 
 const baseEndpoints = [
   'https://api.binance.com',
@@ -71,9 +73,18 @@ const api = {
       '1mo',
     ];
     const endpoint =
-      'https://data.binance.vision/data/spot/daily/klines/ADABKRW/1h/ADABKRW-1h-2020-08.zip';
-    const response = await utils.get(endpoint)
-    console.log(response.data)
+      'https://data.binance.vision/data/spot/daily/klines/1INCHBTC/1h/1INCHBTC-1h-2023-04-07.zip';
+    // Call the binance historic data API and retrieve the zip file
+    const response = await utils.getFile(endpoint);
+    // Create the path name so saves in the temp downloads folder
+    const pathName = path.join(__dirname, '..', 'download', 'temp.zip');
+    // Use the fs module to download and save the temp zip file to server memory
+    const writer = fs.createWriteStream(pathName);
+    response.data.pipe(writer);
+    // Handle unpacking the zip file
+    // Handle writing the csv to the DB
+    // Handle closing the files and deleting temp files
+
   },
 };
 

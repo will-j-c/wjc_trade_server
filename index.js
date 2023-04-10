@@ -1,13 +1,13 @@
 require('dotenv').config();
 const express = require('express');
-const sequelize = require('./database/connection');
+const connection = require('./database/connection');
 
 const app = express();
 const port = process.env.PORT;
 
 // Try connecting to the database
 try {
-  sequelize.authenticate().then((response) => {
+  connection.authenticate().then((response) => {
     console.log('Connection has been established successfully.');
   });
 } catch (error) {
